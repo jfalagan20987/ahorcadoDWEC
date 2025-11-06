@@ -11,7 +11,7 @@ body{
     color: #fff;
     align-items: center;
     justify-content: center;
-    height: 100vH;
+    height: 100vh;
     font-family: 'Lato', sans-serif;
     row-gap: 20px;
 }

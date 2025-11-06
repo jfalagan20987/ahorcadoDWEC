@@ -21,6 +21,30 @@ const crono = document.querySelector('.timer');
 let intervaloCrono = null;
 let tiempo = 0;
 
+// Variables cuenta atrás
+const cuentaAtras = document.querySelector('.cuenta-atras span');
+let tiempoRestante = 10;
+let intervaloCuentaAtras = null;
+
+// Función para controlar la cuenta atrás y el final de la partida cuando los intentos llegan a 0 a causa de esto
+function iniciarCuentaAtras(){
+    tiempoRestante--;
+    cuentaAtras.innerText = tiempoRestante;
+
+    if(tiempoRestante == 0){
+        maxIntentos--;
+        intentos.innerHTML = +maxIntentos;
+        tiempoRestante = 10;
+    }
+
+    if(maxIntentos == 0){
+        resultado.innerText = "¡HAS PERDIDO!";
+        clearInterval(intervaloCrono);
+        clearInterval(intervaloCuentaAtras);
+        teclado.classList.add('no-click');
+    }
+}
+
 // Relleno el campo de la palabra clave con un guión bajo por cada caracter de solucion
 function rellenarPalabra(){
     palabraClave.innerText = ""; //Limpio el contenido cada vez que tengo que rellenar, para evitar duplicación
@@ -65,10 +89,17 @@ teclado.addEventListener('click',(e)=>{
     // Condición para que el crónometro solo se inicie si está a cero y si pulsamos una letra
     if (!intervaloCrono && e.target.classList.contains('letra')) {
         intervaloCrono = setInterval(iniciarCrono, 1000);
+
+        // Añaidmos también el inicio de la cuenta atrás, que no empezará hasta que no empiece la partida
+        intervaloCuentaAtras = setInterval(iniciarCuentaAtras, 1000);
     }
+
 
     // Jugamos con el target para que el evento solo se ejecute al hacer click en una letra que no se haya seleccionado previamente
     if(e.target.classList.contains('letra') && !e.target.classList.contains('acertada') && !e.target.classList.contains('erronea')){
+
+        // Cada vez que realizamos un intento, reiniciamos el contador de cuenta atrás para el intento
+        tiempoRestante = 10;
         
         // Añadimos el valor (letra) del div clickado a una variable
         let caracter = e.target.innerText;
@@ -101,6 +132,7 @@ teclado.addEventListener('click',(e)=>{
             if(maxIntentos == 0){
                 resultado.innerText = "¡HAS PERDIDO!";
                 clearInterval(intervaloCrono);
+                clearInterval(intervaloCuentaAtras);
                 teclado.classList.add('no-click');
             }
         }
