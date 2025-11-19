@@ -1,11 +1,83 @@
 // Elementos del DOM que vamos a necesitar
-const arrayPalabrasClave = ['SERVIDOR', 'CLIENTE', 'RAMIS', 'ORNITORRINCO', 'MASTANTUONO', 'PROYECTO', 'TERROR', 'SOSTENIBILIDAD', 'CANGREJO'];
-const solucion = arrayPalabrasClave[Math.floor(Math.random()*arrayPalabrasClave.length)].split(''); //Método para seleccionar una palabra aleatoria del array de palabras clave
+// const arrayPalabrasClave = ['SERVIDOR', 'CLIENTE', 'RAMIS', 'PROYECTO','SOSTENIBILIDAD'];
+const deportes = ['FUTBOL', 'BALONCESTO', 'HOCKEY', 'CICLISMO', 'AUTOMOVILISMO'];
+const jugadores = ['VINICIUS', 'MBAPPE', 'MASTANTUONO', 'PEDRI', 'RASHFORD'];
+const animales = ['ORNITORRINCO', 'BABUINO', 'MAPACHE', 'ARDILLA'];
+const temas = document.getElementById('temas');
+let solucion = "";
 const guiones = [];
 const palabraClave = document.getElementById('palabraClave');
 const teclado = document.querySelector('.teclado');
 const letras = document.querySelectorAll('.letra:not(.acertada):not(.erronea)');
 const resultado = document.querySelector('.resultado');
+const nuevaPartida = document.getElementById('nuevaPartida');
+
+// Función para reiniciar la partida
+function resetearPartida() {
+
+    // Reiniciar variables correspondientes a la palabra clave
+    solucion = [];
+    guiones.length = 0;
+    palabraClave.innerText = "";
+
+    // Reiniciar intentos y errores
+    maxIntentos = 6;
+    contador = 0;
+    intentos.innerHTML = maxIntentos;
+    errores.innerHTML = contador;
+
+    // Reiniciar cronómetro
+    clearInterval(intervaloCrono);
+    intervaloCrono = null;
+    tiempo = 0;
+    crono.innerText = "00:00:00";
+
+    // Reiniciar cuenta atrás
+    clearInterval(intervaloCuentaAtras);
+    intervaloCuentaAtras = null;
+    tiempoRestante = 10;
+    cuentaAtras.innerText = tiempoRestante;
+
+    // Restaurar teclas
+    document.querySelectorAll('.letra').forEach(letra => {
+        letra.classList.remove('acertada', 'erronea');
+    });
+
+    // Habilitar clicks nuevamente
+    teclado.classList.remove('no-click');
+    temas.classList.remove('no-click');
+
+    // Limpiar mensaje de victoria o derrota
+    resultado.innerText = "";
+
+    // Esconder botón de nueva partida
+    //nuevaPartida.style.display = "none"; -- NO NECESARIO FINALMENTE
+}
+
+// No dejar que se seleccionen teclas al refrescar la página hasta que no se seleccione un tema
+if(temas.value == "SELECCIONE UN TEMA"){
+    teclado.classList.add('no-click');
+}
+
+// Generar palabra
+temas.addEventListener('change', ()=>{
+
+    resetearPartida();
+    
+    if(temas.value == 'deportes'){
+        solucion = deportes[Math.floor(Math.random()*deportes.length)].split('');
+        rellenarPalabra();
+    } else if(temas.value == 'jugadores'){
+        solucion = jugadores[Math.floor(Math.random()*jugadores.length)].split('');
+        rellenarPalabra();
+    } else if(temas.value == 'animales'){
+        solucion = animales[Math.floor(Math.random()*animales.length)].split('');
+        rellenarPalabra();
+    }else{
+        //Evitar que se pueda hacer click en el teclado cuando no hay un tema seleccionado
+        teclado.classList.add('no-click');
+    }
+})
 
 // Variables para el contador de intentos
 const intentos = document.getElementById('intentos');
@@ -21,7 +93,24 @@ const crono = document.querySelector('.timer');
 let intervaloCrono = null;
 let tiempo = 0;
 
-// Variables cuenta atrás
+// Función cronómetro
+function iniciarCrono(){
+    tiempo++; //Determinamos el incremento
+
+    // Variables
+    const horas = Math.floor(tiempo / 3600);
+    const minutos = Math.floor((tiempo % 3600) / 60);
+    const segundos = tiempo % 60;
+
+    // Ajustamos el formato de las variable para que aparezcan ceros a la izquierda y el cronómetro no luzca así: 0:0:1
+    const formatoHoras = horas.toString().padStart(2, '0');
+    const formatoMinutos = minutos.toString().padStart(2, '0');
+    const formatoSegundos = segundos.toString().padStart(2, '0');
+
+    crono.innerText = `${formatoHoras}:${formatoMinutos}:${formatoSegundos}`;
+}
+
+// Variables cuenta atrás para los intentos
 const cuentaAtras = document.querySelector('.cuenta-atras span');
 let tiempoRestante = 10;
 let intervaloCuentaAtras = null;
@@ -45,6 +134,18 @@ function iniciarCuentaAtras(){
     }
 }
 
+// REGISTRO DE PARTIDAS
+
+// Guardar partida
+function registrarPartida(palabraClave, erroresCometidos, tiempoFinal){
+    localStorage.setItem('palabraClave', palabraClave);
+    localStorage.setItem('erroresCometidos', erroresCometidos);
+    localStorage.setItem('tiempoFinal', tiempoFinal);
+}
+
+// Recuperar partidas
+
+
 // Relleno el campo de la palabra clave con un guión bajo por cada caracter de solucion
 function rellenarPalabra(){
     palabraClave.innerText = ""; //Limpio el contenido cada vez que tengo que rellenar, para evitar duplicación
@@ -65,23 +166,6 @@ function letraAcertada(index, letra){
     guiones[index] = letra;
     actualizarPalabra();
 };
-
-// Timer
-function iniciarCrono(){
-    tiempo++; //Determinamos el incremento
-
-    // Variables
-    const horas = Math.floor(tiempo / 3600);
-    const minutos = Math.floor((tiempo % 3600) / 60);
-    const segundos = tiempo % 60;
-
-    // Ajustamos el formato de las variable para que aparezcan ceros a la izquierda y el cronómetro no luzca así: 0:0:1
-    const formatoHoras = horas.toString().padStart(2, '0');
-    const formatoMinutos = minutos.toString().padStart(2, '0');
-    const formatoSegundos = segundos.toString().padStart(2, '0');
-
-    crono.innerText = `${formatoHoras}:${formatoMinutos}:${formatoSegundos}`;
-}
 
 // Evento al hacer click en cualquier letra del teclado que no tenga clase acertada o erronea
 teclado.addEventListener('click',(e)=>{
@@ -117,9 +201,12 @@ teclado.addEventListener('click',(e)=>{
             if(!guiones.includes('_')){
                 resultado.innerText = "¡HAS GANADO!";
                 clearInterval(intervaloCrono); // Paramos el cronómetro
-                
+                clearInterval(intervaloCuentaAtras); // Paramos la cuenta atrás
+
                 // Añado esta clase donde se anula la posibilidad de ejecutar cualquier evento para que el usuario no siga haciendo click sobre las letras
                 teclado.classList.add('no-click');
+                temas.classList.add('no-click');
+                nuevaPartida.style.display="initial";
             }
         }else{
             e.target.classList.toggle('erronea'); // Si falla, se añada la clase "erronea" (fondo rojo) a esa letra
@@ -134,10 +221,14 @@ teclado.addEventListener('click',(e)=>{
                 clearInterval(intervaloCrono);
                 clearInterval(intervaloCuentaAtras);
                 teclado.classList.add('no-click');
+                temas.classList.add('no-click');
+                nuevaPartida.style.display="initial";
             }
         }
     }
 })
+
+nuevaPartida.addEventListener('click', ()=> window.location.href = 'index.html');
 
 // Llamamos a la función para volver a rellenar por si ha habido aciertos
 rellenarPalabra();

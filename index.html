@@ -8,7 +8,15 @@
 </head>
 <body>
     <h1 class="resultado"></h1> <!--Campo que se rellenará cuando termine la partida-->
-    <h2>El Ahorcado</h2>
+    <h2>EL AHORCADO</h2>
+
+    <!--Desplegable para escoger la temática de la palabra-->
+    <select name="temas" id="temas">
+        <option>SELECCIONE UN TEMA</option>
+        <option value="deportes">DEPORTES</option>
+        <option value="jugadores">JUGADORES</option>
+        <option value="animales">ANIMALES</option>
+    </select>
     <p>Seleccione una letra, le quedan <span id="intentos">0</span> intentos.</p> <!--Contador de intentos restantes-->
     <div>
         <h2 id="palabraClave"></h2> <!--Campo que se rellena inicialmente con guiones y se va actualizando a medida que acierta el jugador-->
@@ -58,6 +66,7 @@
     <div class="cuenta-atras">
         <p>Tiempo restante para el intento: <span>10</span> segundos.</p>
     </div>
+    <button id="nuevaPartida">NUEVA PARTIDA</button>
     <script src="script.js"></script>
 </body>
 </html>

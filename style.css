@@ -8,7 +8,7 @@ body{
     background-color: #242333;
     display: flex;
     flex-direction: column;
-    color: #fff;
+    color: #EFF1F3;
     align-items: center;
     justify-content: center;
     height: 100vh;
@@ -31,16 +31,20 @@ span{
 
 .letra{
     background-color: #444451;
-    height: 25px;
-    width: 25px;
+    height: 40px;
+    width: 40px;
     padding: 5px;
     margin: 0 5px;
     text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 4px;
 }
 
 .letra:not(.acertada):not(.erronea):hover{
     cursor: pointer;
-    transform: scale(1.2);
+    /*transform: scale(1.2);*/
+    background-color: #666674;
 }
 
 /*Clases para aciertos y errores*/
@@ -59,4 +63,46 @@ span{
 /*Clase para evitar que el jugador pueda seguir seleccionando letras una vez finalizada la partida*/
 .no-click{
     pointer-events: none;
+}
+
+select{
+    background-color: #444451;
+    color: #EFF1F3;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid #6feaf6;
+    cursor: pointer;
+}
+
+select:focus{
+    outline: none;
+}
+
+#nuevaPartida{
+    display: none;
+    background-color: #6feaf6;
+    color: #242333;
+    font-weight: bold;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+}
+
+#nuevaPartida:hover{
+    /* transform: scale(1.1); */
+    background-color: #b3ecf1;
+}
+
+#palabraClave{
+    font-size: 30px;
+}
+
+p, span, .timer, #nuevaPartida, select, option{
+    font-size: 18px;
+}
+
+span{
+    font-weight: bold;
 }
