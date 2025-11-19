@@ -4,13 +4,22 @@ const deportes = ['FUTBOL', 'BALONCESTO', 'HOCKEY', 'CICLISMO', 'AUTOMOVILISMO']
 const jugadores = ['VINICIUS', 'MBAPPE', 'MASTANTUONO', 'PEDRI', 'RASHFORD'];
 const animales = ['ORNITORRINCO', 'BABUINO', 'MAPACHE', 'ARDILLA'];
 const temas = document.getElementById('temas');
-let solucion = "";
+let solucion = [];
 const guiones = [];
 const palabraClave = document.getElementById('palabraClave');
 const teclado = document.querySelector('.teclado');
 const letras = document.querySelectorAll('.letra:not(.acertada):not(.erronea)');
 const resultado = document.querySelector('.resultado');
 const nuevaPartida = document.getElementById('nuevaPartida');
+
+// Variables de los popups
+const popup = document.getElementById('popupRegistro');
+const guardarPartida = document.getElementById('guardarPartida');
+const nombreJugador = document.getElementById('nombreJugador');
+const verLeaderboardBtn = document.getElementById('verLeaderboard');
+const popupLeaderboard = document.getElementById('popupLeaderboard');
+const cerrarLeaderboardBtn = document.getElementById('cerrarLeaderboard');
+const tablaLeaderboardBody = document.querySelector('#tablaLeaderboard tbody'); // Cuerpo de la tabla que hemos dejado vacío en el html
 
 // Función para reiniciar la partida
 function resetearPartida() {
@@ -50,8 +59,12 @@ function resetearPartida() {
     // Limpiar mensaje de victoria o derrota
     resultado.innerText = "";
 
-    // Esconder botón de nueva partida
-    //nuevaPartida.style.display = "none"; -- NO NECESARIO FINALMENTE
+    // Reiniciamos el popup de guardar partida
+    if (popup) {
+        popup.classList.remove('popup-visible');
+        popup.classList.add('popup-oculto');
+        if (nombreJugador) nombreJugador.value = "";
+    }
 }
 
 // No dejar que se seleccionen teclas al refrescar la página hasta que no se seleccione un tema
@@ -62,6 +75,7 @@ if(temas.value == "SELECCIONE UN TEMA"){
 // Generar palabra
 temas.addEventListener('change', ()=>{
 
+    // Si cambiamos de tema en mitad de la partida, se genera una partida totalmente nueva
     resetearPartida();
     
     if(temas.value == 'deportes'){
@@ -135,18 +149,6 @@ function iniciarCuentaAtras(){
     }
 }
 
-// REGISTRO DE PARTIDAS
-
-// Guardar partida
-function registrarPartida(palabraClave, erroresCometidos, tiempoFinal){
-    localStorage.setItem('palabraClave', palabraClave);
-    localStorage.setItem('erroresCometidos', erroresCometidos);
-    localStorage.setItem('tiempoFinal', tiempoFinal);
-}
-
-// Recuperar partidas
-
-
 // Relleno el campo de la palabra clave con un guión bajo por cada caracter de solucion
 function rellenarPalabra(){
     palabraClave.innerText = ""; //Limpio el contenido cada vez que tengo que rellenar, para evitar duplicación
@@ -199,7 +201,7 @@ teclado.addEventListener('click',(e)=>{
             }
 
             // Si detectamos que no quedan guiones en la palabra, es que el jugador ha ganado la partida
-            if(!guiones.includes('_')){
+            if(solucion.length > 0 && guiones.length > 0 && !guiones.includes('_') && solucion.length > 0){
                 resultado.innerText = "¡HAS GANADO!";
                 clearInterval(intervaloCrono); // Paramos el cronómetro
                 clearInterval(intervaloCuentaAtras); // Paramos la cuenta atrás
@@ -207,6 +209,9 @@ teclado.addEventListener('click',(e)=>{
                 // Añado esta clase donde se anula la posibilidad de ejecutar cualquier evento para que el usuario no siga haciendo click sobre las letras
                 teclado.classList.add('no-click');
                 temas.classList.add('no-click');
+                popup.classList.remove('popup-oculto');
+                popup.classList.add('popup-visible');
+
                 nuevaPartida.style.display="initial";
             }
         }else{
@@ -231,5 +236,96 @@ teclado.addEventListener('click',(e)=>{
 
 nuevaPartida.addEventListener('click', ()=> window.location.href = 'index.html');
 
-// Llamamos a la función para volver a rellenar por si ha habido aciertos
-rellenarPalabra();
+// REGISTRO DE PARTIDAS
+guardarPartida.addEventListener('click', ()=>{
+    
+    // Objeto partida
+    const partida = {
+        jugador: nombreJugador.value,
+        palabra: solucion.join(''),
+        errores: contador,
+        tiempo: crono.innerText
+    };
+
+    // Recuperamos las partidas anteriores (si las tenemos) y guardamos la nueva
+    let partidasGuardadas = JSON.parse(localStorage.getItem('partidas')) || [];
+
+    partidasGuardadas.push(partida);
+
+    localStorage.setItem('partidas', JSON.stringify(partidasGuardadas));
+
+    popup.classList.remove('popup-visible');
+    popup.classList.add('popup-oculto');
+})
+
+// Función para poder comparar los tiempos en el Leaderboard -- He tenido que buscarlo, porque únicamente con el crono.innexText no funcionaría, al ser texto plano
+function tiempoAHoras(segundosStr){
+    const partes = segundosStr.split(':').map(Number);
+    return partes[0]*3600 + partes[1]*60 + partes[2];
+}
+
+// Función para generar el contenido de las mejores partidas (leaderboard)
+function generarLeaderboard(){
+
+    // Recuperamos las partidas y las clasificamos por palabra
+    const partidas = JSON.parse(localStorage.getItem('partidas')) || [];
+    const mejoresPorPalabra = {};
+
+    // Recorremos el array con todas las partidas
+    partidas.forEach(partida => {
+        const tiempoSeg = tiempoAHoras(partida.tiempo); // Llamamos a la función para poder comparar tiempo
+        const palabra = partida.palabra; // Seleccionamos la palabra
+
+        if(!mejoresPorPalabra[palabra]){ // Si no hay mejor registro para esa palabra, se escoge el primero que se encuentre
+            mejoresPorPalabra[palabra] = [{...partida, tiempoSeg}];
+        } else {
+            const actual = mejoresPorPalabra[palabra]; // En caso de ya existir un registro, lo guardamos como la mejor partida actual de esa palabra
+            const mejorErrores = actual[0].errores; // Guardamos sus errores
+            const mejorTiempo = actual[0].tiempoSeg; // Guardamos su tiempo total
+
+            if(partida.errores < mejorErrores){
+                mejoresPorPalabra[palabra] = [{...partida, tiempoSeg}]; // Si hay una con menos errores, la sustituye
+            
+            // Si tienen el mismo número de errores, comparamos tiempo total
+            } else if(partida.errores === mejorErrores){
+                if(tiempoSeg < mejorTiempo){
+                    mejoresPorPalabra[palabra] = [{...partida, tiempoSeg}]; // Si hay una con menor tiempo, la sustituye
+                } else if(tiempoSeg === mejorTiempo){
+                    actual.push({...partida, tiempoSeg}); // Si igualan en todo, se mostrarán las dos
+                }
+            }
+        }
+    });
+
+    // Limpiar tabla
+    tablaLeaderboardBody.innerHTML = "";
+
+    // Añadir filas -- Bucle for para iterar sobre las mejores puntuaciones
+    for (const palabra in mejoresPorPalabra) {
+    const puntuaciones = mejoresPorPalabra[palabra];
+
+    // Para cada palabra, creamos una fila en la tabla del Leaderboard
+    puntuaciones.forEach(puntuacion => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${puntuacion.palabra}</td>
+            <td>${puntuacion.jugador}</td>
+            <td>${puntuacion.errores}</td>
+            <td>${puntuacion.tiempo}</td>
+        `;
+        tablaLeaderboardBody.appendChild(fila);
+    });
+}
+}
+
+// Eventos del popup
+verLeaderboardBtn.addEventListener('click', ()=>{
+    generarLeaderboard();
+    popupLeaderboard.classList.remove('popup-oculto');
+    popupLeaderboard.classList.add('popup-visible');
+});
+
+cerrarLeaderboardBtn.addEventListener('click', ()=>{
+    popupLeaderboard.classList.remove('popup-visible');
+    popupLeaderboard.classList.add('popup-oculto');
+});

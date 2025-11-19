@@ -106,3 +106,89 @@ p, span, .timer, #nuevaPartida, select, option{
 span{
     font-weight: bold;
 }
+
+/* POPUPS */
+
+/* Para ocultarlos */
+.popup-oculto {
+    display: none;
+}
+
+/* Para mostrarlos */
+.popup-visible {
+    display: flex;
+}
+
+/* Le damos estilo al popup de guardar partida acorde al resto de elementos */
+#popupRegistro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-contenido {
+    background: #444451;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+}
+
+.popup-contenido input {
+    width: 80%;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+.popup-contenido button {
+    padding: 8px 12px;
+    background: #6feaf6;
+    color: #242333;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Estilo del popup de las mejores puntuaciones (leaderboard) */
+#verLeaderboard{
+    background-color: #6feaf6;
+    color: #242333;
+    font-weight: bold;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+}
+
+#verLeaderboard:hover{
+    background-color: #b3ecf1;
+}
+
+#tablaLeaderboard{
+    width: 100%;
+    border-collapse: collapse; /* Esto lo he buscado, para poder darle un mejor estilo a los bordes de la tabla */
+    margin-top: 10px;
+}
+
+#tablaLeaderboard th, #tablaLeaderboard td{
+    padding: 8px;
+    border: 1px solid #6feaf6;
+    text-align: center;
+}
+
+#tablaLeaderboard th{
+    background-color: #444451;
+    color: #EFF1F3;
+}
+
+#cerrarLeaderboard{
+    margin-top: 8px;
+}

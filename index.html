@@ -66,7 +66,45 @@
     <div class="cuenta-atras">
         <p>Segundos restantes para el intento: <span>10</span></p>
     </div>
+
+    <!--Botón que aparece al finalizar una partida (más cómodo y amigable que refrescar la página)-->
     <button id="nuevaPartida">NUEVA PARTIDA</button>
+
+    <!--Popup que se despliega al ganar una partida, para poder registrarla-->
+    <div id="popupRegistro" class="popup-oculto">
+        <div class="popup-contenido">
+            <h2>¡Has ganado!</h2>
+            <p>Ingresa tu nombre para registrar tu partida:</p>
+            <input type="text" id="nombreJugador" placeholder="Tu nombre...">
+            <button id="guardarPartida">Guardar</button>
+        </div>
+    </div>
+
+    <!--Botón para desplegar el popup con las mejores partidas de cada palabra-->
+    <button id="verLeaderboard">Mejores partidas</button>
+    <div id="popupLeaderboard" class="popup-oculto">
+        <div class="popup-contenido">
+            <h2>Mejores partidas</h2>
+            <table id="tablaLeaderboard">
+                <!--Nombre de los campos mostrados-->
+                <thead>
+                    <tr>
+                        <th>Palabra</th>
+                        <th>Jugador</th>
+                        <th>Errores</th>
+                        <th>Tiempo</th>
+                    </tr>
+                </thead>
+
+                <!--Contenido que se rellena en el JS-->
+                <tbody>
+                </tbody>
+            </table>
+
+            <!--Botón para cerrar el popup-->
+            <button id="cerrarLeaderboard">Cerrar</button>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
