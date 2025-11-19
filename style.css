@@ -31,12 +31,12 @@ span{
 
 .letra{
     background-color: #444451;
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     padding: 5px;
     margin: 0 5px;
     text-align: center;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     border-radius: 4px;
 }
