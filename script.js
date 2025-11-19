@@ -131,6 +131,7 @@ function iniciarCuentaAtras(){
         clearInterval(intervaloCrono);
         clearInterval(intervaloCuentaAtras);
         teclado.classList.add('no-click');
+        nuevaPartida.style.display="initial";
     }
 }
 
